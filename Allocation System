@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Allocation System </title>
+    <style>
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        input {
+            width: 90%;
+            padding: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        #searchItemCode {
+            padding: 8px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        .manual-input {
+            background-color: #fff3cd;
+        }
+        .button-group {
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sales Allocation System</h1>
+
+    <!-- Search Bar -->
+    <input type="text" id="searchItemCode" placeholder="Search by Item Code">
+    <button onclick="searchItem()">Search</button>
+
+    <br><br>
+
+    <!-- Form for entering details -->
+    <form id="salesForm">
+        <table>
+            <tr>
+                <th>Item Code </th>
+                <th> AGM / DGM </th>
+                <th> 1 April -31 Oct Sales </th>
+                <th>Sale Percentage</th>
+                <th>As at Today In Hand</th>
+                <th>New Allocation</th>
+                <th>To Be In Hand</th>
+                <th>Balance Allocation</th>
+            </tr>
+            <tr>
+                <td><input type="text" id="itemCode" placeholder="Item Code " required></td>
+                <td>
+                    LALIN ANTHONY<br>
+                    SHEHAN FRANANDO<br>
+                    AMILA PERERA
+                </td>
+                <td>
+                    <input type="number" id="saleLaleen" placeholder="Lalin Anthony"required><br>
+                    <input type="number" id="saleShehan" placeholder="Shehan Franando" required><br>
+                    <input type="number" id="saleAmila" placeholder="Amila Perera" required>
+                </td>
+                <td>
+                    <input type="number" id="salePercentageLaleen" placeholder="Lalin Anthony %" readonly><br>
+                    <input type="number" id="salePercentageShehan" placeholder="Shehan Franando %" readonly><br>
+                    <input type="number" id="salePercentageAmila" placeholder="Amila Perera %" readonly>
+                </td>
+                <td>
+                    <input type="number" id="asAtTodayInHandLaleen" placeholder="Lalin Anthony" required><br>
+                    <input type="number" id="asAtTodayInHandShehan" placeholder="Shehan Franando" required><br>
+                    <input type="number" id="asAtTodayInHandAmila" placeholder="Amila Perera" required>
+                    <br><br>
+                    <strong>Total As at Today In Hand: </strong><span id="totalAsAtTodayInHand">0</span>
+                </td>
+                <td>
+                    <input type="number" id="newAllocation" placeholder="New Allocation" required>
+                </td>
+                <td>
+                    <input type="number" id="toBeInHandLaleen" placeholder="Lalin Anthony" class="manual-input"><br>
+                    <input type="number" id="toBeInHandShehan" placeholder="Shehan Franando" class="manual-input"><br>
+                    <input type="number" id="toBeInHandAmila" placeholder="Amila Perera" class="manual-input">
+                </td>
+                <td>
+                    <input type="number" id="balanceLaleen" placeholder="Lalin Anthony" class="manual-input"><br>
+                    <input type="number" id="balanceShehan" placeholder="Shehan Franando" class="manual-input"><br>
+                    <input type="number" id="balanceAmila" placeholder="Amila Perera" class="manual-input">
+                </td>
+            </tr>
+        </table>
+
+        <div class="button-group">
+            <button type="button" onclick="calculate()">Auto Calculate</button>
+            <button type="button" onclick="save()">Save</button>
+            <button type="button" onclick="resetForm()" style="background-color: #ff9999;">Reset Form</button>
+            <button type="button" onclick="resetAllData()" style="background-color: #ff6666;">Reset All Data</button>
+        </div>
+    </form>
+
+    <h2>Saved Data</h2>
+    <table id="savedData">
+        <tr>
+            <th>Item Code</th>
+            <th>Name</th>
+            <th>Sale</th>
+            <th>Sale Percentage</th>
+            <th>As at Today In Hand</th>
+            <th>New Allocation</th>
+            <th>To Be In Hand</th>
+            <th>Balance Allocation</th>
+        </tr>
+    </table>
+
+    <script>
+        // Initialize saved data array
+        let savedDataArray = [];
+
+        function calculate() {
+    // Get sale values
+    const saleLaleen = parseFloat(document.getElementById("saleLaleen").value) || 0;
+    const saleShehan = parseFloat(document.getElementById("saleShehan").value) || 0;
+    const saleAmila = parseFloat(document.getElementById("saleAmila").value) || 0;
+
+    // Calculate total sale
+    const totalSale = saleLaleen + saleShehan + saleAmila;
+
+    if (totalSale > 0) {
+        // Calculate and set sale percentages
+        document.getElementById("salePercentageLaleen").value = ((saleLaleen / totalSale) * 100).toFixed(2);
+        document.getElementById("salePercentageShehan").value = ((saleShehan / totalSale) * 100).toFixed(2);
+        document.getElementById("salePercentageAmila").value = ((saleAmila / totalSale) * 100).toFixed(2);
+    }
+
+    // Get current in-hand values
+    const asAtTodayInHandLaleen = parseFloat(document.getElementById("asAtTodayInHandLaleen").value) || 0;
+    const asAtTodayInHandShehan = parseFloat(document.getElementById("asAtTodayInHandShehan").value) || 0;
+    const asAtTodayInHandAmila = parseFloat(document.getElementById("asAtTodayInHandAmila").value) || 0;
+
+    // Calculate and display total in-hand
+    const totalAsAtTodayInHand = asAtTodayInHandLaleen + asAtTodayInHandShehan + asAtTodayInHandAmila;
+    document.getElementById("totalAsAtTodayInHand").textContent = totalAsAtTodayInHand.toFixed(2);
+
+    // Get new allocation
+    const newAllocation = parseFloat(document.getElementById("newAllocation").value) || 0;
+
+    // Calculate suggested values (user can modify these)
+    if (totalSale > 0) {
+        const salePercentageLaleen = parseFloat(document.getElementById("salePercentageLaleen").value) || 0;
+        const salePercentageShehan = parseFloat(document.getElementById("salePercentageShehan").value) || 0;
+        const salePercentageAmila = parseFloat(document.getElementById("salePercentageAmila").value) || 0;
+
+        // Calculate and round To Be In Hand values
+        const toBeInHandLaleen = Math.round((totalAsAtTodayInHand + newAllocation) * (salePercentageLaleen / 100));
+        const toBeInHandShehan = Math.round((totalAsAtTodayInHand + newAllocation) * (salePercentageShehan / 100));
+        const toBeInHandAmila = Math.round((totalAsAtTodayInHand + newAllocation) * (salePercentageAmila / 100));
+
+        // Set suggested values (user can modify)
+        document.getElementById("toBeInHandLaleen").value = toBeInHandLaleen;
+        document.getElementById("toBeInHandShehan").value = toBeInHandShehan;
+        document.getElementById("toBeInHandAmila").value = toBeInHandAmila;
+
+        // Calculate and round Balance Allocation values
+        document.getElementById("balanceLaleen").value = Math.round(toBeInHandLaleen - asAtTodayInHandLaleen);
+        document.getElementById("balanceShehan").value = Math.round(toBeInHandShehan - asAtTodayInHandShehan);
+        document.getElementById("balanceAmila").value = Math.round(toBeInHandAmila - asAtTodayInHandAmila);
+    }
+}
+        
+
+        // Save function
+        function save() {
+            const itemCode = document.getElementById("itemCode").value;
+            if (!itemCode) {
+                alert("Please enter an Item Code");
+                return;
+            }
+
+            const newData = {
+                itemCode: itemCode,
+                names: ["LALIN ANTHONY", "SHEHAN FRANANDO", "AMILA PERERA"],
+                sales: [
+                    document.getElementById("saleLaleen").value,
+                    document.getElementById("saleShehan").value,
+                    document.getElementById("saleAmila").value
+                ],
+                salePercentages: [
+                    document.getElementById("salePercentageLaleen").value,
+                    document.getElementById("salePercentageShehan").value,
+                    document.getElementById("salePercentageAmila").value
+                ],
+                asAtTodayInHand: [
+                    document.getElementById("asAtTodayInHandLaleen").value,
+                    document.getElementById("asAtTodayInHandShehan").value,
+                    document.getElementById("asAtTodayInHandAmila").value
+                ],
+                newAllocation: document.getElementById("newAllocation").value,
+                toBeInHand: [
+                    document.getElementById("toBeInHandLaleen").value,
+                    document.getElementById("toBeInHandShehan").value,
+                    document.getElementById("toBeInHandAmila").value
+                ],
+                balanceAllocation: [
+                    document.getElementById("balanceLaleen").value,
+                    document.getElementById("balanceShehan").value,
+                    document.getElementById("balanceAmila").value
+                ]
+            };
+
+            // Check if item code already exists
+            const existingIndex = savedDataArray.findIndex(item => item.itemCode === itemCode);
+            if (existingIndex !== -1) {
+                if (confirm("Item code already exists. Do you want to update it?")) {
+                    savedDataArray[existingIndex] = newData;
+                } else {
+                    return;
+                }
+            } else {
+                savedDataArray.push(newData);
+            }
+
+            updateSavedDataTable();
+            resetForm();
+            alert("Data saved successfully!");
+        }
+
+        // Update saved data table
+        function updateSavedDataTable() {
+            const table = document.getElementById("savedData");
+            // Clear existing rows except header
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            // Add new rows
+            savedDataArray.forEach(data => {
+                const row = table.insertRow(-1);
+                
+                // Add cells
+                const cells = [
+                    data.itemCode,
+                    data.names.join("<br>"),
+                    data.sales.join("<br>"),
+                    data.salePercentages.join("<br>"),
+                    data.asAtTodayInHand.join("<br>"),
+                    data.newAllocation,
+                    data.toBeInHand.join("<br>"),
+                    data.balanceAllocation.join("<br>")
+                ];
+
+                cells.forEach(cellData => {
+                    const cell = row.insertCell(-1);
+                    cell.innerHTML = cellData;
+                });
+            });
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById("salesForm").reset();
+            document.getElementById("totalAsAtTodayInHand").textContent = "0";
+        }
+
+        // Reset all data
+        function resetAllData() {
+            if (confirm("Are you sure you want to reset all saved data? This cannot be undone.")) {
+                savedDataArray = [];
+                updateSavedDataTable();
+                resetForm();
+                alert("All data has been reset!");
+            }
+        }
+
+        // Search function
+        function searchItem() {
+            const searchCode = document.getElementById("searchItemCode").value.trim().toLowerCase();
+            const foundData = savedDataArray.find(data => 
+                data.itemCode.toLowerCase() === searchCode
+            );
+
+            if (foundData) {
+                document.getElementById("itemCode").value = foundData.itemCode;
+                document.getElementById("saleLaleen").value = foundData.sales[0];
+                document.getElementById("saleShehan").value = foundData.sales[1];
+                document.getElementById("saleAmila").value = foundData.sales[2];
+                document.getElementById("salePercentageLaleen").value = foundData.salePercentages[0];
+                document.getElementById("salePercentageShehan").value = foundData.salePercentages[1];
+                document.getElementById("salePercentageAmila").value = foundData.salePercentages[2];
+                document.getElementById("asAtTodayInHandLaleen").value = foundData.asAtTodayInHand[0];
+                document.getElementById("asAtTodayInHandShehan").value = foundData.asAtTodayInHand[1];
+                document.getElementById("asAtTodayInHandAmila").value = foundData.asAtTodayInHand[2];
+                document.getElementById("newAllocation").value = foundData.newAllocation;
+                document.getElementById("toBeInHandLaleen").value = foundData.toBeInHand[0];
+                document.getElementById("toBeInHandShehan").value = foundData.toBeInHand[1];
+                document.getElementById("toBeInHandAmila").value = foundData.toBeInHand[2];
+                document.getElementById("balanceLaleen").value = foundData.balanceAllocation[0];
+                document.getElementById("balanceShehan").value = foundData.balanceAllocation[1];
+                document.getElementById("balanceAmila").value = foundData.balanceAllocation[2];
+            } else {
+                alert("No data found for the given Item Code");
+            }
+        }
+    </script>
+</body>
+</html>
